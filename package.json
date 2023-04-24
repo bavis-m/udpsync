@@ -1,0 +1,21 @@
+{
+  "name": "udpshare",
+  "version": "1.0.0",
+  "description": "Daemon to monitor syncs between a remote and local directory, using udpsend to transfer missing files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mark@mhack.io",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "compose-middleware": "^5.0.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "express-session-sequelize": "^2.3.0",
+    "mustache-express": "^1.3.2",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.31.0"
+  }
+}
