@@ -38,5 +38,5 @@ module.exports = function(app, r)
         //utils.accelRedirect(req => req.session.authed_user.uri)
     );
 
-    r.return(404);
+    r.use((_, res) => res.status(404).end());
 }
