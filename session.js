@@ -17,7 +17,7 @@ module.exports = function(app)
             secret: app.ctx.settings.session.secret,
             saveUninitialized: true,
             rolling: true,
-            resave: true,
+            resave: false,
         }),
         (req, _, next) =>
         {
