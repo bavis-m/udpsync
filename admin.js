@@ -10,7 +10,7 @@ module.exports = function(app, r)
     r.use(
         async (req, res, next) =>
         {
-            let seq = req.app.ctx.sequelize;
+            const seq = req.app.ctx.sequelize;
 
             // get some db stats
             req.num_users = await seq.models.User.count();
@@ -29,6 +29,8 @@ module.exports = function(app, r)
     r.post('/do_set_admin',
         async (req, res) =>
         {
+            const seq = req.app.ctx.sequelize;
+
             if (req.num_users > 0)
             {
                 res.showPage("login.html", 'Admin account already set');
@@ -37,7 +39,7 @@ module.exports = function(app, r)
 
             if (typeof req.body.password == 'string' && req.body.password.trim().length > 0)
             {
-                await userauth.createUser("admin", req.body.password.trim());
+                await userauth.createUser(seq, "admin", req.body.password.trim());
             }
             res.showPage("login.html", 'Admin password set');
         }
