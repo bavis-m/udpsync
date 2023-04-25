@@ -9,8 +9,9 @@ const setMainAppRoutes = require('./app.js');
 
 let utils = require('./utils.js');
 
+
 let settings = {
-    port: 8091,
+    port: 80,
     db: {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 3306,
