@@ -21,23 +21,23 @@ module.exports = function(app, r)
             if (user)
             {
                 req.session.authed_user = user.toJSON();
-                res.redirect(303, '/');
+                await res.redirectWithSession(303, '/');
             }
             else
             {
-                res.showPage("login.html", 'Login failed');
+                await res.showPage("login.html", 'Login failed');
             }
         }
     );
 
     // logout
     r.post('/do_logout',
-        (req, res) =>
+        async (req, res) =>
         {
             const name = req.session.authed_user.name;
             delete req.session.authed_user;
             delete req.session.auth;
-            res.showPage("login.html", `Logged out from user <b>${name}</b>`);
+            await res.showPage("login.html", `Logged out from user <b>${name}</b>`);
         }
     );
 };

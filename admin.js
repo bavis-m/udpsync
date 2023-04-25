@@ -17,7 +17,7 @@ module.exports = function(app, r)
 
             if (req.num_users == 0 && !allowedWithNoAdminPassword.includes(req.url))
             {
-                res.showPage("set_admin.html");
+                await res.showPage("set_admin.html");
                 return;
             }
 
@@ -33,7 +33,7 @@ module.exports = function(app, r)
 
             if (req.num_users > 0)
             {
-                res.showPage("login.html", 'Admin account already set');
+                await res.showPage("login.html", 'Admin account already set');
                 return;
             }
 
@@ -41,7 +41,7 @@ module.exports = function(app, r)
             {
                 await userauth.createUser(seq, "admin", req.body.password.trim());
             }
-            res.showPage("login.html", 'Admin password set');
+            await res.showPage("login.html", 'Admin password set');
         }
     );
 }

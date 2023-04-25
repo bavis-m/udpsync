@@ -1,4 +1,4 @@
-function showPage(url, msg = null) { return (req, res) => res.showPage(url, msg); }
+function showPage(url, msg = null) { return async (req, res) => await res.showPage(url, msg); }
 
 function accelRedirect(getLocCallback)
 {
@@ -26,10 +26,10 @@ function getHelpersMiddleware()
             }
         };
 
-        res.showPage = (url, msg = null) =>
+        res.showPage = async (url, msg = null) =>
         {
             if (msg) res.addMsg(msg);
-            res.redirect(303, `/${req.app.ctx.settings.mount}/${url}`);
+            await res.redirectWithSession(303, `/${req.app.ctx.settings.mount}/${url}`);
             res.end();
         };
 

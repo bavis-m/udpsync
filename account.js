@@ -31,7 +31,7 @@ module.exports = function(app, r)
                 }
                 else
                 {
-                    res.showPage("account.html", "Invalid request");
+                    await res.showPage("account.html", "Invalid request");
                 }
             }
         }

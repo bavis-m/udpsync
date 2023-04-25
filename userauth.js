@@ -43,18 +43,18 @@ const express =
             }
             else
             {
-                loginMiddleware(req, res, next);
+                await loginMiddleware(req, res, next);
             }
         }
     },
 
     mustBeLoggedOut: function()
     {
-        return (req, res, next) =>
+        return async (req, res, next) =>
         {
             if (req.session.authed_user)
             {
-                res.redirect(303, '/');
+                await res.redirectWithSession(303, '/');
                 return;
             }
             next();
