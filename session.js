@@ -19,8 +19,16 @@ module.exports = function(app)
             rolling: true,
             resave: false,
         }),
-        (req, _, next) =>
+        (req, res, next) =>
         {
+            res.redirectWithSession = (status, path) => new Promise((resolve, reject) =>
+            {
+                req.session.save(() =>
+                    {
+                        res.redirect(status, path);
+                        resolve();
+                    });
+            });
             if (!req.processed_session_state)
             {
                 if (!req.last_state) req.last_state = {};
