@@ -5,8 +5,10 @@ const modelFiles = [ './models/user.js' ];
 async function initDb(settings)
 {
     const sequelize = new Sequelize(
-        `mysql://${settings.db.user}:${settings.db.password}@${settings.db.host}:${settings.db.port}/${settings.db.database}`,
-        { logging: false }
+        settings.db.database,
+        settings.db.user,
+        settings.db.password,
+        { logging: false, logQueryParameters: false, host: settings.db.host, dialect: 'mysql', port: settings.db.port }
     );
 
     modelFiles.forEach(f => require(f)(sequelize, DataTypes));
