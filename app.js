@@ -3,6 +3,7 @@ const utils = require('./utils-express.js');
 const sessionMiddleware = require('./session.js');
 const frontendRouter = require('./frontend.js');
 const userauth = require('./userauth.js');
+const nocache = require('nocache');
 
 const staticRoute = "/frontend";
 
@@ -19,6 +20,7 @@ module.exports = function(app, r)
 
     // everything else gets a session and the showPage helper()
     r.use(
+        nocache(),
         sessionMiddleware(app),
         utils.getHelpersMiddleware()
     );

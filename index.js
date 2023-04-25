@@ -46,6 +46,7 @@ let settings = {
     app.engine('mustache', mustache());
     app.set('view engine', 'mustache');
     app.set('views', 'views');
+    app.set('etag', false);
 
     setMainAppRoutes(app);
 
