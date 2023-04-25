@@ -4,7 +4,6 @@ const userauth = require('./userauth.js');
 const setupAdminRoutes = require('./admin.js');
 const setupLoginRoutes = require('./login.js');
 const setupAccountRoutes = require('./account.js');
-const setupLinkRoutes = require('./links.js');
 
 const utils = require('./utils-express.js');
 
@@ -21,7 +20,6 @@ module.exports = function(app)
     setupAdminRoutes(app, r);
     setupLoginRoutes(app, r);
     setupAccountRoutes(app, r);
-    setupLinkRoutes(app, r);
 
     // page rendering
     r.get(/^\/([^/]+).html$/,
