@@ -5,9 +5,11 @@ const frontendRouter = require('./frontend.js');
 const userauth = require('./userauth.js');
 const nocache = require('nocache');
 
+const initSync = require('./sync/sync.js');
+
 const staticRoute = "/frontend";
 
-module.exports = function(app, r)
+module.exports = async function(app, r)
 {
     if (r === undefined) r = app;
 
@@ -15,7 +17,7 @@ module.exports = function(app, r)
 
     // public static files served straight away
     r.use(staticRoute,
-        express.static('public')
+        express.static('client/public')
     );
 
     // everything else gets a session and the showPage helper()
@@ -31,12 +33,16 @@ module.exports = function(app, r)
         (_, res) => res.end() // just in case
     );
 
+    
+
     // everything else gets the regular login page authentication
     // accelRedirect *ALWAYS* terminates
     r.use(
         userauth.express.mustBeLoggedIn(true, utils.showPage("login.html")),
         //utils.accelRedirect(req => req.session.authed_user.uri)
     );
+
+    await initSync(app);
 
     r.use((_, res) => res.status(404).end());
 }

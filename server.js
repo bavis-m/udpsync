@@ -3,11 +3,11 @@ const mustache = require('mustache-express');
 
 const url = require('url');
 
-const sequelize = require('./db.js');
+const { init: sequelize } = require('./server/db.js');
 
-const setMainAppRoutes = require('./app.js');
+const setMainAppRoutes = require('./server/app.js');
 
-let utils = require('./utils.js');
+let utils = require('./server/utils.js');
 
 
 let settings = {
@@ -15,16 +15,16 @@ let settings = {
     db: {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 3306,
-        user: process.env.DB_USER || 'udpshare',
+        user: process.env.DB_USER || 'udpsync',
         password: process.env.DB_PWD || '',
-        database: process.env.DB_DB || 'udpshare',
+        database: process.env.DB_DB || 'udpsync',
     },
     session: {
-        name: process.env.SESS_SID || 'udpshare.sid',
-        secret: process.env.SESS_SEC || 'udpsharelogincookiesecret',
+        name: process.env.SESS_SID || 'udpsync.sid',
+        secret: process.env.SESS_SEC || 'udpsync',
         age: 1 * 60 * 60,   // one hour
     },
-    title: 'udpshare frontend',
+    title: 'udpsync frontend',
     mount: 'admin',
 };
 
@@ -46,13 +46,13 @@ let settings = {
     app.set('trust proxy', true);
     app.engine('mustache', mustache());
     app.set('view engine', 'mustache');
-    app.set('views', 'views');
+    app.set('views', 'client/views');
     app.set('etag', false);
 
-    setMainAppRoutes(app);
+    await setMainAppRoutes(app);
+    
 
     app.listen(settings.port, () => {
       console.log(`Frontend listening at http://localhost:${settings.port}`)
     });
 })();
-
