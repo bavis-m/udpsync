@@ -1,0 +1,1 @@
+docker run --rm --name udpsync -p 8099:80 -e DB_HOST=172.18.0.5 -e DB_PWD --network bridge2 -v /mnt/user/projects/udpsync:/app -it udpsync
