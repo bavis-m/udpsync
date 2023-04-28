@@ -29,7 +29,7 @@ function getHelpersMiddleware()
         res.showPage = async (url, msg = null) =>
         {
             if (msg) res.addMsg(msg);
-            await res.redirectWithSession(303, `/${req.app.ctx.settings.mount}/${url}`);
+            await res.redirectWithSession(303, '/' + url);
             res.end();
         };
 

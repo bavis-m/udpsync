@@ -1,13 +1,13 @@
+require('app-module-path').addPath(__dirname);
+
 const express = require('express');
 const mustache = require('mustache-express');
 
-const url = require('url');
+const { init: sequelize } = require('./db.js');
 
-const { init: sequelize } = require('./server/db.js');
+const setMainAppRoutes = require('./app.js');
 
-const setMainAppRoutes = require('./server/app.js');
-
-let utils = require('./server/utils.js');
+let utils = require('utils/utils.js');
 
 
 let settings = {
@@ -24,8 +24,7 @@ let settings = {
         secret: process.env.SESS_SEC || 'udpsync',
         age: 1 * 60 * 60,   // one hour
     },
-    title: 'udpsync frontend',
-    mount: 'admin',
+    title: 'udpsync frontend'
 };
 
 // main function

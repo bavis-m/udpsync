@@ -1,11 +1,8 @@
 const express = require('express');
-const userauth = require('./userauth.js');
 
-const setupAdminRoutes = require('./admin.js');
-const setupLoginRoutes = require('./login.js');
-const setupAccountRoutes = require('./account.js');
-
-const utils = require('./utils-express.js');
+const setupAdminRoutes = require('users/admin.js');
+const setupLoginRoutes = require('users/login.js');
+const setupAccountRoutes = require('users/account.js');
 
 module.exports = function(app)
 {
@@ -32,19 +29,22 @@ module.exports = function(app)
             let params = { title:settings.title, msg: req.last_state && Array.isArray(req.last_state.msg) ? req.last_state.msg.join("<br>") : '', ...res.template_params };
             if (req.session.authed_user) params.user = req.session.authed_user.name;
 
-            res.render(view, params,
-                (err, html) =>
-                {
-                    if (err)
+            if (!process.env.NO_MUSTACHE)
+            {
+                res.render(view, params,
+                    (err, html) =>
                     {
-                        res.status(404).end();
-                        console.log(err);
-                    }
-                    else
-                    {
-                        res.send(html).end();
-                    }
-                });
+                        if (err)
+                        {
+                            res.status(404).end();
+                            console.log(err);
+                        }
+                        else
+                        {
+                            res.send(html).end();
+                        }
+                    });
+            }
         }
     );
 

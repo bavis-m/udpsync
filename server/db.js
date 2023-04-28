@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const modelFiles = [ './models/user.js' ];
+const modelFiles = [ 'models/user.js' ];
 
 async function init(settings)
 {

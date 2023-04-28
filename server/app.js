@@ -1,48 +1,40 @@
 const express = require('express');
-const utils = require('./utils-express.js');
-const sessionMiddleware = require('./session.js');
-const frontendRouter = require('./frontend.js');
-const userauth = require('./userauth.js');
+const utils = require('utils/utils-express.js');
 const nocache = require('nocache');
 
-const initSync = require('./sync/sync.js');
+const sessionMiddleware = require('session.js');
+const frontendRouter = require('frontend.js');
+const setupSync = require('sync/sync.js');
 
-const staticRoute = "/frontend";
 
 module.exports = async function(app, r)
 {
     if (r === undefined) r = app;
 
-    const frontendRoute = "/" + app.ctx.settings.mount + "/";
-
-    // public static files served straight away
-    r.use(staticRoute,
-        express.static('client/public')
-    );
-
-    // everything else gets a session and the showPage helper()
     r.use(
+        // public static files/bundled files served straight away
+        express.static('client/public'),
+        express.static('client/dist'),
+
+        // nothing else is cached
         nocache(),
+
+        // url encoded data ni requests
+        express.urlencoded({extended:true}),
+
+        // load the user's session and the showPage helper()
         sessionMiddleware(app),
-        utils.getHelpersMiddleware()
+        utils.getHelpersMiddleware(),
+
+        // frontend hookups
+        frontendRouter(app)
     );
 
-    // frontendRouter *SHOULD ALWAY* terminates
-    r.use(frontendRoute,
-        frontendRouter(app),
-        (_, res) => res.end() // just in case
+    // do this before the catchall below, as it may setup routes
+    await setupSync(app, r);
+
+    // just in case
+    r.use(        
+        (_, res) => res.status(404).end() 
     );
-
-    
-
-    // everything else gets the regular login page authentication
-    // accelRedirect *ALWAYS* terminates
-    r.use(
-        userauth.express.mustBeLoggedIn(true, utils.showPage("login.html")),
-        //utils.accelRedirect(req => req.session.authed_user.uri)
-    );
-
-    await initSync(app);
-
-    r.use((_, res) => res.status(404).end());
-}
+};

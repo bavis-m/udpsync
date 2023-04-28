@@ -21,7 +21,7 @@ module.exports = function(app, r)
             if (user)
             {
                 req.session.authed_user = user.toJSON();
-                await res.redirectWithSession(303, '/');
+                await res.showPage("account.html", 'Logged in');
             }
             else
             {

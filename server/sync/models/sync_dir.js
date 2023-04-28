@@ -2,7 +2,7 @@ module.exports = function(sequelize, DataTypes)
 {
     const SyncDir = sequelize.define("SyncDir", {
         id: { type:DataTypes.INTEGER, primaryKey:true, autoIncrement: true },
-        local_path: { type:DataTypes.STRING, unique:true },
+        local_path: { type:DataTypes.STRING, unique:"local_path", allowNull:false },
         remote_path: { type:DataTypes.STRING },
         remote_host: { type:DataTypes.STRING },
         remote_user: { type:DataTypes.STRING },

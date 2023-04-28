@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
-const { compose } = require('compose-middleware');
-const { showPage } = require('./utils-express.js');
+const { showPage } = require('utils/utils-express.js');
 
 async function hash(password)
 {
