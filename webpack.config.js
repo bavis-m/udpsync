@@ -3,9 +3,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   context: path.resolve(__dirname, 'client/src'),
-  entry: [
-    "./test.js"
-  ],
+  entry: {
+    test: "./test.js"
+  },
   devtool: process.env.PRODUCTION ? false : 'eval-cheap-source-map',
   mode: process.env.PRODUCTION ? 'production' : 'development',
   output: {
@@ -22,13 +22,13 @@ module.exports = {
   module: {
     rules: [
         {
-            test: /\.(js)$/,
+            test: /\.(js|jsx)$/,
             exclude: /node_modules/,
             use: ['babel-loader']
         }
     ]
   },
   resolve: {
-    extensions: ["*", ".js"]
+    extensions: ["*", ".js", ".jsx"]
   }
 };
