@@ -1,11 +1,10 @@
 <html
     <head>
         <title>{{{title}}}</title>
-        <script src="bundles/main.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
     </head>
     <body>
-        <p>{{{msg}}}
-
         <form action="do_login" method="post">
             <p><input type="text" name="user" placeholder="User Name" autofocus>
 
@@ -13,5 +12,6 @@
 
             <p><input type="submit" value="Login">
         </form>
+        <script>$(function() { Dist.toast.toast({{{toasts}}}); });</script>
     </body>
 </html>

@@ -34,10 +34,10 @@ module.exports = function(app)
                 if (!req.last_state) req.last_state = {};
                 if (req.session.last_state)
                 {
-                    if (Array.isArray(req.session.last_state.msg))
+                    if (Array.isArray(req.session.last_state.toasts))
                     {
-                        if (!Array.isArray(req.last_state.msg)) req.last_state.msg = [];
-                        req.last_state.msg.push(...req.session.last_state.msg);
+                        if (!Array.isArray(req.last_state.toasts)) req.last_state.toasts = [];
+                        req.last_state.toasts.push(...req.session.last_state.toasts);
                     }
                 }
                 delete req.session.last_state;

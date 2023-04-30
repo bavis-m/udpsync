@@ -1,4 +1,4 @@
-function showPage(url, msg = null) { return async (req, res) => await res.showPage(url, msg); }
+function showPage(url, toast = null) { return async (req, res) => await res.showPage(url, toast); }
 
 function accelRedirect(getLocCallback)
 {
@@ -16,19 +16,19 @@ function getHelpersMiddleware()
     {
         res.template_params = {};
 
-        res.addMsg = msg =>
+        res.addMsg = toast =>
         {
             if (req.session)
             {
                 if (!req.session.last_state) req.session.last_state = {};
-                if (!Array.isArray(req.session.last_state.msg)) req.session.last_state.msg = [];
-                req.session.last_state.msg.push(msg);
+                if (!Array.isArray(req.session.last_state.toasts)) req.session.last_state.toasts = [];
+                req.session.last_state.toasts.push(toast);
             }
         };
 
-        res.showPage = async (url, msg = null) =>
+        res.showPage = async (url, toast = null) =>
         {
-            if (msg) res.addMsg(msg);
+            if (toast) res.addMsg(toast);
             await res.redirectWithSession(303, '/' + url);
             res.end();
         };

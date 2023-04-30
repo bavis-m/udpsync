@@ -26,7 +26,7 @@ module.exports = function(app)
 
             const settings = req.app.ctx.settings;
 
-            let params = { title:settings.title, msg: req.last_state && Array.isArray(req.last_state.msg) ? req.last_state.msg.join("<br>") : '', ...res.template_params };
+            let params = { title:settings.title, toasts: JSON.stringify(req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : []), ...res.template_params };
             if (req.session.authed_user) params.user = req.session.authed_user.name;
 
             if (!process.env.NO_MUSTACHE)
