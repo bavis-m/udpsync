@@ -26,7 +26,9 @@ module.exports = function(app)
 
             const settings = req.app.ctx.settings;
 
-            let params = { title:settings.title, toasts: JSON.stringify(req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : []), ...res.template_params };
+            const toastsData = JSON.stringify(req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : []);
+
+            let params = { title:settings.title, toasts: `<script>$(function() { Dist.toast.toast(${toastsData}); });</script>`, ...res.template_params };
             if (req.session.authed_user) params.user = req.session.authed_user.name;
 
             if (!process.env.NO_MUSTACHE)

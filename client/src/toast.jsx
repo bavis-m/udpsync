@@ -13,7 +13,7 @@ export function toast(toasts)
     for (const t of toasts)
     {
         const ret = convertHtmlToReact(t)
-        reactToast(<>{ret}</>);
+        reactToast(<div style={{display:'flex', alignItems: 'center', justifyContent: 'center'}}><div>{ret}</div></div>);
     }
 }
 
