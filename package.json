@@ -7,7 +7,7 @@
     "debug": "npm-run-all --parallel debug:webpack debug:nodemon",
     "debug:webpack": "webpack --progress --color --watch",
     "debug:nodemon": "nodemon -e js,mustache --ignore client/src server/server.js",
-    "clean": "rm -rf client/dist/* client/views/*"
+    "clean": "rm -rf client/dist"
   },
   "author": "mark@mhack.io",
   "license": "ISC",

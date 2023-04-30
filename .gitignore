@@ -2,4 +2,3 @@
 node_modules
 nohup.out
 client/dist
-client/views

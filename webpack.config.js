@@ -19,7 +19,7 @@ module.exports = {
   mode: process.env.PRODUCTION ? 'production' : 'development',
   output: {
     filename: 'bundles/[name].js',
-    path: path.resolve(__dirname, 'client/dist'),
+    path: path.resolve(__dirname, 'client/dist/public'),
     library: {
       name: ['Dist', '[name]'],
       type: 'var'

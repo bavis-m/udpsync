@@ -45,7 +45,7 @@ let settings = {
     app.set('trust proxy', true);
     app.engine('mustache', mustache());
     app.set('view engine', 'mustache');
-    app.set('views', 'client/views');
+    app.set('views', 'client/dist/views');
     app.set('etag', false);
 
     await setMainAppRoutes(app);

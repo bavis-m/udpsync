@@ -14,7 +14,7 @@ module.exports = async function(app, r)
     r.use(
         // public static files/bundled files served straight away
         express.static('client/public'),
-        express.static('client/dist'),
+        express.static('client/dist/public'),
 
         // nothing else is cached
         nocache(),
