@@ -25,17 +25,24 @@ module.exports = function(app, r)
         }
     );
 
+    r.use(['/do_set_admin', '/set_admin.html'],
+        async (req, res, next) =>
+        {
+            if (req.num_users > 0)
+            {
+                await res.showPage("login.html", 'Admin account already set');                
+                return;
+            }
+
+            next();
+        }
+    );
+
     // initial admin account setup
     r.post('/do_set_admin',
         async (req, res) =>
         {
             const seq = req.app.ctx.sequelize;
-
-            if (req.num_users > 0)
-            {
-                await res.showPage("login.html", 'Admin account already set');
-                return;
-            }
 
             if (typeof req.body.password == 'string' && req.body.password.trim().length > 0)
             {

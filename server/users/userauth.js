@@ -53,7 +53,7 @@ const express =
         {
             if (req.session.authed_user)
             {
-                await res.redirectWithSession(303, '/');
+                await res.redirectWithSession(303, '/account.html');
                 return;
             }
             next();
