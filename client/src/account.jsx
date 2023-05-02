@@ -16,7 +16,7 @@ root.render(
         <form action="do_set_password" method="post">
         <Box m={2}>
         <Grid container direction="column">        
-            <TextField variant="outlined" type="password" name="old_password" label="Old Password" autofocus/><br/>
+            <TextField variant="outlined" type="password" name="old_password" label="Old Password" autoFocus/><br/>
             <TextField variant="outlined" type="password" name="new_password" label="New Password"/><br/>
             <TextField variant="outlined" type="password" name="new_password2" label="Confirm New Password"/><br/>
             <Button variant="contained" type="submit">Change Password</Button>

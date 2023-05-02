@@ -17,6 +17,12 @@ export function toast(toasts)
     }
 }
 
+if (Array.isArray(window.initial_toasts))
+{
+    toast(window.initial_toasts);
+    delete window.initial_toasts;
+}
+
 export const Toast = (props) => <ToastContainer
                         position="top-center"
                         autoClose={false}

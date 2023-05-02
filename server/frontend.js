@@ -28,7 +28,7 @@ module.exports = function(app)
 
             const toastsData = JSON.stringify(req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : []);
 
-            let params = { title:settings.title, toasts: `<script>$(function() { Dist.toast(${toastsData}); });</script>`, ...res.template_params };
+            let params = { title:settings.title, toasts: `<script>window.initial_toasts = ${toastsData};</script>`, ...res.template_params };
             if (req.session.authed_user) params.user = req.session.authed_user.name;
 
             if (!process.env.NO_MUSTACHE)

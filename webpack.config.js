@@ -6,6 +6,28 @@ const pages = [
   'login', 'account', 'set_admin'
 ];
 
+const plugins = [];
+for (let page of pages)
+{
+  plugins.push(
+    new HtmlWebpackPlugin({
+      template: `views/template.mustache`,
+      filename: `../views/${page}.mustache`,
+      chunks: [page],
+      publicPath: '/',
+      minify: false
+    })
+  );
+}
+if (process.env.NO_MUSTACHE)
+{
+  plugins.push(new CopyPlugin({
+    patterns: [
+        { from: "./**/*.html", to: "./" }
+    ]
+  }));
+}
+
 module.exports = {
   context: path.resolve(__dirname, 'client/src'),
   entry: pages.reduce((o, p) => ({...o, [p]: `./${p}.jsx`}), {}),
@@ -19,26 +41,13 @@ module.exports = {
       type: 'global'
     }
   },
-  plugins: pages.map(page => 
-    new HtmlWebpackPlugin({
-      template: `views/template.mustache`,
-      filename: `../views/${page}.mustache`,
-      chunks: [page],
-      publicPath: '/'
-    }))
-    .concat(
-      process.env.NO_MUSTACHE ? [
-        new CopyPlugin({
-            patterns: [
-                { from: "./**/*.html", to: "./" }
-            ]
-        })
-      ] : []),
+  plugins: plugins,
   optimization: {
     splitChunks: {
       // include all types of chunks
       chunks: 'all',
     },
+    runtimeChunk: 'single'
   },
   module: {
     rules: [
