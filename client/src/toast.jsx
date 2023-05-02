@@ -17,18 +17,13 @@ export function toast(toasts)
     }
 }
 
-const domNode = document.createElement('div');
-domNode.id = "toast";
-document.body.appendChild(domNode);
-const root = createRoot(domNode);
-
-root.render(<ToastContainer
-    position="top-center"
-    autoClose={false}
-    newestOnTop={false}
-    closeOnClick
-    rtl={false}
-    pauseOnFocusLoss
-    draggable
-    theme="light"
-    />);
+export const Toast = (props) => <ToastContainer
+                        position="top-center"
+                        autoClose={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        theme="light"
+                        />;

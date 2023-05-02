@@ -12,7 +12,10 @@
   "author": "mark@mhack.io",
   "license": "ISC",
   "dependencies": {
+    "@emotion/react": "^11.10.8",
+    "@emotion/styled": "^11.10.8",
     "@hedgedoc/html-to-react": "^1.4.6",
+    "@mui/material": "^5.12.2",
     "app-module-path": "^2.2.0",
     "bcrypt": "^5.1.0",
     "compose-middleware": "^5.0.1",
