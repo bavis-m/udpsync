@@ -1,6 +1,7 @@
 const express = require('express');
 const { loadModel } = require('db.js');
-const createAPIRoutes = require('./api/api.js');
+const { createAPIRoutes, apiLoginFailure } = require('./api/api.js');
+const userauth = require('users/userauth.js')
 
 module.exports = async (app, r) =>
 {
@@ -18,5 +19,8 @@ module.exports = async (app, r) =>
 
     createAPIRoutes(api, await loadModel(seq, './sync/models/sync_dir.js'));
 
-    r.use("/api/", api);
+    r.use("/api/",
+        userauth.express.mustBeLoggedIn(false, apiLoginFailure),
+        api
+    );
 };

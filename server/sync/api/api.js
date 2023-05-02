@@ -6,9 +6,15 @@ function createAPIRoutes(r, model)
         r.get(`/${name}/all`, async (_, res) =>
         {
             const all = await model.findAll();
-            res.json(all.map(d => d.toJSON()));
+            res.json({[model.api_plural || (name + "s")]:all.map(d => d.toJSON())});
         });
     }
 }
 
-module.exports = createAPIRoutes;
+function apiLoginFailure(req, res, next)
+{
+    res.json({error:"Must be logged in"});
+    res.end();
+}
+
+module.exports = { createAPIRoutes, apiLoginFailure };
