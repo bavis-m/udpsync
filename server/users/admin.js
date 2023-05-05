@@ -30,7 +30,7 @@ module.exports = function(app, r)
         {
             if (req.num_users > 0)
             {
-                await res.showPage("login.html", 'Admin account already set');                
+                await res.showPage("", 'Admin account already set');                
                 return;
             }
 
@@ -48,7 +48,7 @@ module.exports = function(app, r)
             {
                 await userauth.createUser(seq, "admin", req.body.password.trim());
             }
-            await res.showPage("login.html", 'Admin password set');
+            await res.showPage("", 'Admin password set');
         }
     );
 }

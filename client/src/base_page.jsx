@@ -12,8 +12,9 @@ import {
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
-import { AccountCircle } from '@mui/icons-material';
-import { ManageAccounts } from '@mui/icons-material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import HomeIcon from '@mui/icons-material/Home';
 
 function LogoutBox(props)
 {
@@ -29,13 +30,16 @@ function LogoutBox(props)
     const open = Boolean(attach);
     const id = open ? 'logout-popover' : undefined;
 
-    const goToAccount = () => window.location.href = "/account.html";
+    const goTo = url => (() => window.location.href = url);
 
     return (
         <>
             <Box style={{ position: "fixed", top: 0, right: 0, zIndex: 2000 }} m={2}>
+                <IconButton onClick={goTo("/")}>
+                    <HomeIcon style={{ fontSize:60 }}/>
+                </IconButton>
                 <IconButton onClick={handleClick}>
-                    <AccountCircle style={{ fontSize:60 }}/>
+                    <AccountCircleIcon style={{ fontSize:60 }}/>
                 </IconButton>
             </Box>
             <Popover
@@ -50,7 +54,7 @@ function LogoutBox(props)
                     style={{zIndex: 2001}}
             >
                 <Box m={2}>
-                    <Typography><IconButton component="span" onClick={goToAccount}><ManageAccounts style={{ fontSize:30 }}/></IconButton> {props.authedUser.name}</Typography>
+                    <Typography><IconButton component="span" onClick={goTo("/account.html")}><ManageAccountsIcon style={{ fontSize:30 }}/></IconButton> {props.authedUser.name}</Typography>
                     <form action="/do_logout" method="post">
                         <Button sx={{mt:2}} fullWidth variant="contained" type="submit">Log Out</Button>
                     </form>
@@ -63,7 +67,28 @@ function LogoutBox(props)
 
 export function createBasePage(content)
 {
-    const theme = createTheme();
+    const theme = createTheme({
+        palette:
+        {
+            background:
+            {
+                default: "#eeeee4"
+            }
+        },
+        components:
+        {
+            MuiAccordion:
+            {
+                styleOverrides:
+                {
+                    root:
+                    {
+                        backgroundColor: "#f1f8f9"
+                    }
+                }
+            }
+        }
+    });
 
     const root = createRoot(document.getElementById('root'));
     root.render(
@@ -75,9 +100,7 @@ export function createBasePage(content)
                 { window.initial_data.authed_user && <LogoutBox authedUser={window.initial_data.authed_user}/> }
                 
                 <Container maxWidth="md" sx={{mt:3}}>
-                    <Card sx={{p:3}}>
-                        {content}
-                    </Card>
+                    {content}
                 </Container>
             </ThemeProvider>
         </React.Fragment>

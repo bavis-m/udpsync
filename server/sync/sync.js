@@ -19,12 +19,14 @@ module.exports = async (app, r) =>
 
     createAPIRoutes(api, await loadModels(seq, './sync/models.js'));
 
-    r.use("/setup.html",
+    r.get('/',
         userauth.express.mustBeLoggedIn(false),
         async (req, res, next) =>
         {
             res.initial_data.hosts = (await seq.models.Host.findAll()).map(h => h.toJSON());
             res.initial_data.sync_dirs = (await seq.models.SyncDir.findAll()).map(h => t.toJSON());
+            
+            req.url = "/home.html";
             next();
         }
     );

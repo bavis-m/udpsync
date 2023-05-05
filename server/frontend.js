@@ -20,8 +20,6 @@ module.exports = function(app)
     setupLoginRoutes(app, r);
     setupAccountRoutes(app, r);
 
-    r.get('/', showPage("setup.html"));
-
     // page rendering
     r.get(/^\/([^/]+).html$/,
         (req, res) =>

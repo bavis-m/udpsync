@@ -3,7 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const pages = [
-  'login', 'account', 'set_admin', 'setup'
+  'login', 'account', 'set_admin', 'home'
 ];
 
 const plugins = [];
