@@ -1,13 +1,18 @@
-function createAPIRoutes(r, model)
+function createAPIRoutes(r, models)
 {
-    const name = model.api_name || model.name;
-    if (model.api_all || model.api_all === undefined)
+    if (!Array.isArray(models)) models = [models];
+
+    for (const model of models)
     {
-        r.get(`/${name}/all`, async (_, res) =>
+        const name = model.api_name || model.name;
+        if (model.api_all || model.api_all === undefined)
         {
-            const all = await model.findAll();
-            res.json({[model.api_plural || (name + "s")]:all.map(d => d.toJSON())});
-        });
+            r.get(`/${name}/all`, async (_, res) =>
+            {
+                const all = await model.findAll();
+                res.json({[model.api_plural || (name + "s")]:all.map(d => d.toJSON())});
+            });
+        }
     }
 }
 

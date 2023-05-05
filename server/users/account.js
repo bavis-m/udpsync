@@ -26,7 +26,7 @@ module.exports = function(app, r)
                     await userauth.changePassword(user, req.body.new_password.trim());
                     user.save();
                     res.addMsg("Password changed! Please re-log in.");
-                    req.url = "/admin/do_logout";
+                    req.url = "/do_logout";
                     req.app.handle(req, res);
                 }
                 else

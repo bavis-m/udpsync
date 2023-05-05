@@ -4,6 +4,8 @@ const setupAdminRoutes = require('users/admin.js');
 const setupLoginRoutes = require('users/login.js');
 const setupAccountRoutes = require('users/account.js');
 
+const { showPage } = require('utils/utils-express.js');
+
 module.exports = function(app)
 {
     const r = express.Router();
@@ -18,6 +20,8 @@ module.exports = function(app)
     setupLoginRoutes(app, r);
     setupAccountRoutes(app, r);
 
+    r.get('/', showPage("setup.html"));
+
     // page rendering
     r.get(/^\/([^/]+).html$/,
         (req, res) =>
@@ -26,10 +30,14 @@ module.exports = function(app)
 
             const settings = req.app.ctx.settings;
 
-            const toastsData = JSON.stringify(req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : []);
+            res.initial_data.toasts = req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : [];
 
-            let params = { title:settings.title, toasts: `<script>window.initial_toasts = ${toastsData};</script>`, ...res.template_params };
-            if (req.session.authed_user) params.user = req.session.authed_user.name;
+            if (req.session.authed_user)
+            {
+                res.initial_data.authed_user = req.session.authed_user;
+            }
+
+            let params = { title:settings.title, ...res.template_params, initial_data: `<script>window.initial_data = ${JSON.stringify(res.initial_data)};</script>` };
 
             if (!process.env.NO_MUSTACHE)
             {

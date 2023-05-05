@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const modelFiles = [ 'models/user.js' ];
+const modelFiles = [ 'users/models.js' ];
 
 async function init(settings)
 {
@@ -15,21 +15,24 @@ async function init(settings)
 
     for (modelFile of modelFiles)
     {
-        await loadModel(sequelize, modelFile);
+        await loadModels(sequelize, modelFile);
     }
 
     return sequelize;
 }
 
-async function loadModel(sequelize, file)
+async function loadModels(sequelize, file)
 {
-    const model = require(file)(sequelize, DataTypes);
+    let models = require(file)(sequelize, DataTypes);
+    if (!Array.isArray(models)) models = [models];
 
-    if (typeof model.associate == 'function') model.associate(sequelize.models);
-    
-    await model.sync({ alter:true });
+    for (const model of models)
+    {
+        if (typeof model.associate == 'function') model.associate(sequelize.models);    
+        await model.sync({ alter:true });
+    }
 
-    return model;
+    return models;
 }
 
-module.exports = { init, loadModel };
+module.exports = { init, loadModels };

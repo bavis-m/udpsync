@@ -17,10 +17,10 @@ export function toast(toasts)
     }
 }
 
-if (Array.isArray(window.initial_toasts))
+if (Array.isArray(window.initial_data.toasts))
 {
-    toast(window.initial_toasts);
-    delete window.initial_toasts;
+    toast(window.initial_data.toasts);
+    delete window.initial_data.toasts;
 }
 
 export const Toast = (props) => <ToastContainer

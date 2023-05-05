@@ -15,6 +15,7 @@ function getHelpersMiddleware()
     return (req, res, next) =>
     {
         res.template_params = {};
+        res.initial_data = {};
 
         res.addMsg = toast =>
         {

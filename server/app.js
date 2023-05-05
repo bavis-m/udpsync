@@ -25,16 +25,16 @@ module.exports = async function(app, r)
         // load the user's session and the showPage helper()
         sessionMiddleware(app),
         utils.getHelpersMiddleware(),
-
-        // frontend hookups
-        frontendRouter(app)
     );
 
-    // do this before the catchall below, as it may setup routes
+    // may pass info to frontend, so do that here
     await setupSync(app, r);
 
-    // just in case
-    r.use(        
+    r.use(
+        // frontend hookups
+        frontendRouter(app), 
+
+        // just in case
         (_, res) => res.status(404).end() 
     );
 };
