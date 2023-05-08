@@ -17,6 +17,11 @@ module.exports = class HostHandler
         return `/tmp/sshcontrol_${this.host.id}`;
     }
 
+    get userAtHost()
+    {
+        return this.host.user + '@' + this.host.host;
+    }
+
     toJSON()
     {
         return { ...this.host.toJSON(), state:this.state, error:this.error };
@@ -42,7 +47,9 @@ module.exports = class HostHandler
             this.error = "invalid_identity";
         }
 
-        this.process = spawn("/udpsend/yeshup", ["/usr/bin/ssh", "-N", "-M", "-S", this.controlPath, "-i", this.host.identity_file, this.host.user + "@" + this.host.host], { detached: true, stdio: 'ignore' });
+        if (fs.existsSync(this.controlPath)) fs.unlinkSync(this.controlPath);
+
+        this.process = spawn("/udpsend/yeshup", ["/usr/bin/ssh", "-N", "-M", "-S", this.controlPath, "-i", this.host.identity_file, this.userAtHost], { detached: true, stdio: 'ignore' });
         this.process.unref();
 
         if (this.process)

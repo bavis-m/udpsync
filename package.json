@@ -4,9 +4,13 @@
   "description": "Daemon to monitor syncs between a remote and local directory, using udpsend to transfer missing files",
   "private": true,
   "scripts": {
-    "debug": "npm-run-all --parallel debug:webpack debug:nodemon",
-    "debug:webpack": "webpack --progress --color --watch",
-    "debug:nodemon": "nodemon -e js,mustache --ignore client/src server/server.js",
+    "debug": "npm-run-all --parallel webpack:watch nodemon",
+    "inspect": "npm-run-all --parallel webpack:watch nodemon:inspect",
+    "inspectbrk": "npm-run-all --parallel webpack:watch nodemon:inspectbrk",
+    "webpack:watch": "webpack --progress --color --watch",
+    "nodemon": "nodemon -e js,mustache --ignore client/src server/server.js",
+    "nodemon:inspect": "nodemon --inspect=0.0.0.0:3000 -e js,mustache --ignore client/src server/server.js",
+    "nodemon:inspectbrk": "nodemon --inspect-brk=0.0.0.0:3000 -e js,mustache --ignore client/src server/server.js",
     "clean": "rm -rf client/dist"
   },
   "author": "mark@mhack.io",

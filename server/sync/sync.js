@@ -3,8 +3,10 @@ const { loadModels } = require('db.js');
 const { createAPIRoutes, apiLoginFailure } = require('./api/api.js');
 const userauth = require('users/userauth.js');
 const HostHandler = require('./HostHandler.js');
+const SyncDirHandler = require('./SyncDirHandler.js');
 
 const handlerByHostId = new Map();
+const handlerBySyncDirId = new Map();
 
 module.exports = async (app, r) =>
 {
@@ -21,21 +23,30 @@ module.exports = async (app, r) =>
     );
 
     await loadModels(seq, './sync/models.js');
+
     for (const host of await seq.models.Host.findAll())
     {
-        const remote = new HostHandler(host);
-        remote.run();
-        handlerByHostId.set(host.id, remote);
+        const handler = new HostHandler(host);
+        handler.run();
+        handlerByHostId.set(host.id, handler);
+    }
+
+    for (const syncDir of await seq.models.SyncDir.findAll())
+    {
+        const handler = new SyncDirHandler(handlerByHostId.get(syncDir.HostId), syncDir);
+        handler.run();
+        handlerBySyncDirId.set(syncDir.id, handler);
     }
 
     createAPIRoutes(api, {name:"host", plural:"hosts"}, id => handlerByHostId.get(parseInt(id)), () => handlerByHostId.values());
+    createAPIRoutes(api, {name:"sync_dir", plural:"sync_dirs"}, id => handlerBySyncDirId.get(parseInt(id)), () => handlerBySyncDirId.values());
 
     r.get('/',
         userauth.express.mustBeLoggedIn(false),
         async (req, res, next) =>
         {
             res.initial_data.hosts = (await seq.models.Host.findAll()).map(h => h.toJSON());
-            res.initial_data.sync_dirs = (await seq.models.SyncDir.findAll()).map(h => t.toJSON());
+            res.initial_data.sync_dirs = (await seq.models.SyncDir.findAll()).map(s => s.toJSON());
             
             req.url = "/home.html";
             next();
