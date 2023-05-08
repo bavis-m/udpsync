@@ -1,18 +1,42 @@
-function createAPIRoutes(r, models)
+function createAPIRoutes(r, names, get, getAll)
 {
-    if (!Array.isArray(models)) models = [models];
-
-    for (const model of models)
+    let name = null, plural = null;
+    if (names.name)
     {
-        const name = model.api_name || model.name;
-        if (model.api_all || model.api_all === undefined)
+        name = names.name;
+        if (names.plural) plural = names.plural;
+    }
+    if (!name) name = String(names);
+    name = name.trim();
+    if (name.length == 0) return;
+
+    if (plural) plural = plural.trim();
+    if (!plural || plural.length == 0) plural = name + "s";
+
+    if (getAll)
+    {
+        r.get(`/${name}/all`, async (_, res) =>
         {
-            r.get(`/${name}/all`, async (_, res) =>
+            const all = await getAll();
+            res.json({[plural]:Array.from(all).map(d => d.toJSON())});
+        });
+    }
+    
+    if (get)
+    {
+        r.get(`/${name}/:id`, async (req, res) =>
+        {
+            const v = await get(req.params.id);
+            if (v)
             {
-                const all = await model.findAll();
-                res.json({[model.api_plural || (name + "s")]:all.map(d => d.toJSON())});
-            });
-        }
+                res.json({[name]:v.toJSON()});
+            }
+            else
+            {
+                res.status(404).end();
+            }
+            
+        });
     }
 }
 

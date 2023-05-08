@@ -1,7 +1,10 @@
 const express = require('express');
 const { loadModels } = require('db.js');
 const { createAPIRoutes, apiLoginFailure } = require('./api/api.js');
-const userauth = require('users/userauth.js')
+const userauth = require('users/userauth.js');
+const HostHandler = require('./HostHandler.js');
+
+const handlerByHostId = new Map();
 
 module.exports = async (app, r) =>
 {
@@ -17,7 +20,15 @@ module.exports = async (app, r) =>
         express.urlencoded({extended:true}),
     );
 
-    createAPIRoutes(api, await loadModels(seq, './sync/models.js'));
+    await loadModels(seq, './sync/models.js');
+    for (const host of await seq.models.Host.findAll())
+    {
+        const remote = new HostHandler(host);
+        remote.run();
+        handlerByHostId.set(host.id, remote);
+    }
+
+    createAPIRoutes(api, {name:"host", plural:"hosts"}, id => handlerByHostId.get(parseInt(id)), () => handlerByHostId.values());
 
     r.get('/',
         userauth.express.mustBeLoggedIn(false),

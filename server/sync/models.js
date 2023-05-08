@@ -4,6 +4,8 @@ module.exports = function(sequelize, DataTypes)
         id: { type:DataTypes.INTEGER, primaryKey:true, autoIncrement: true },
         user: { type:DataTypes.STRING, allowNull:false, unique:"user_host" },
         host: { type:DataTypes.STRING, allowNull:false, unique:"user_host" },
+        identity_file : { type:DataTypes.STRING, allowNull:false },
+        paused: { type:DataTypes.BOOLEAN, allowNull: false }
     }, { sequelize });
     Host.api_name = "host";
 
