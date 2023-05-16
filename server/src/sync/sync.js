@@ -1,5 +1,5 @@
 const express = require('express');
-const { loadModels } = require('db.js');
+const { loadModels } = require('db_seq.js');
 const { createAPIRoutes, apiLoginFailure } = require('./api/api.js');
 const userauth = require('users/userauth.js');
 const HostHandler = require('./HostHandler.js');
@@ -7,6 +7,8 @@ const SyncDirHandler = require('./SyncDirHandler.js');
 
 const handlerByHostId = new Map();
 const handlerBySyncDirId = new Map();
+
+const getModels = require('./models.js');
 
 module.exports = async (app, r) =>
 {
@@ -22,7 +24,7 @@ module.exports = async (app, r) =>
         express.urlencoded({extended:true}),
     );
 
-    await loadModels(seq, './sync/models.js');
+    await loadModels(seq, getModels);
 
     for (const host of await seq.models.Host.findAll())
     {

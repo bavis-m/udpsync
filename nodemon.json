@@ -1,0 +1,7 @@
+{
+    "watch": [
+        "client/dist",
+        "server/dist"
+    ],
+    "ext":"js,mustache"
+}

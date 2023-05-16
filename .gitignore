@@ -1,4 +1,6 @@
 *.swp
+tsconfig.tsbuildinfo
 node_modules
 nohup.out
 client/dist
+server/dist

@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "lib":["ES6"],
+        "noImplicitAny": false,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowJs": true,
+        "rootDir": "server/src",
+        "outDir": "server/dist",
+        "preserveWatchOutput": true,
+        "baseUrl": "server/src",
+        "sourceMap": true
+    },
+    "files": [
+        "server/src/server.js",
+        //"server/src/users/models_typeorm.ts"
+    ],
+    "watchOptions": {
+        // Use native file system events for files and directories
+        "watchFile": "useFsEvents",
+        "watchDirectory": "useFsEvents",
+        // Poll files for updates more frequently
+        // when they're updated a lot.
+        "fallbackPolling": "dynamicPriority",
+        // Don't coalesce watch notification
+        "synchronousWatchDirectory": false,
+        // Finally, two additional settings for reducing the amount of possible
+        // files to track  work from these directories
+        "excludeDirectories": ["**/node_modules", "**/dist", "client"],
+    }
+}

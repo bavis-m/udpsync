@@ -42,7 +42,7 @@ function createAPIRoutes(r, names, get, getAll)
 
 function apiLoginFailure(req, res, next)
 {
-    res.json({error:"Must be logged in"});
+    res.json({errors:[{message:"No authentication"}]});
     res.end();
 }
 

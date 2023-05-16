@@ -1,13 +1,14 @@
+require('reflect-metadata');
 require('app-module-path').addPath(__dirname);
 
 const express = require('express');
 const mustache = require('mustache-express');
 
-const { init: sequelize } = require('./db.js');
+const { init: sequelize } = require('./db_seq.js');
 
 const setMainAppRoutes = require('./app.js');
 
-let utils = require('utils/utils.js');
+let utils = require('./utils/utils.js');
 
 
 let settings = {
@@ -45,7 +46,7 @@ let settings = {
     app.set('trust proxy', true);
     app.engine('mustache', mustache());
     app.set('view engine', 'mustache');
-    app.set('views', 'client/dist/views');
+    app.set('views', '/app/client/dist/views');
     app.set('etag', false);
 
     await setMainAppRoutes(app);

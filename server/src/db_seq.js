@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const modelFiles = [ 'users/models.js' ];
+const { getUserModel } = require('users/models.js');
 
 async function init(settings)
 {
@@ -13,17 +13,14 @@ async function init(settings)
 
     sequelize.authenticate();
 
-    for (modelFile of modelFiles)
-    {
-        await loadModels(sequelize, modelFile);
-    }
+    await loadModels(sequelize, getUserModel);
 
     return sequelize;
 }
 
-async function loadModels(sequelize, file)
+async function loadModels(sequelize, getModels)
 {
-    let models = require(file)(sequelize, DataTypes);
+    let models = getModels(sequelize, DataTypes);
     if (!Array.isArray(models)) models = [models];
 
     for (const model of models)

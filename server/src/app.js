@@ -9,6 +9,16 @@ const setupAdminRoutes = require('users/admin.js');
 const setupLoginRoutes = require('users/login.js');
 const setupAccountRoutes = require('users/account.js');
 
+const userauth = require('users/userauth.js');
+const { apiLoginFailure } = require('sync/api/api.js');
+
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { default: GraphQLJSON, GraphQLJSONObject } = require('graphql-type-json');
+
+const { createHandler } = require('graphql-http/lib/use/express');
+
+const { schemaAndResolvers: userSchemaAndResolvers } = require('users/models.js');
+
 
 module.exports = async function(app, r)
 {
@@ -16,8 +26,8 @@ module.exports = async function(app, r)
 
     r.use(
         // public static files/bundled files served straight away
-        express.static('client/public'),
-        express.static('client/dist/public'),
+        express.static('/app/client/public'),
+        express.static('/app/client/dist/public'),
 
         // nothing else is cached
         nocache(),
@@ -30,8 +40,22 @@ module.exports = async function(app, r)
         utils.getHelpersMiddleware(),
     );
 
+    const schemasAndResolvers = [{schema:`
+scalar JSON
+scalar JSONObject
+
+type Query {
+    test: String!
+}
+    `,
+        resolvers: {Query:{test:() => "blah"}}
+    },
+    userSchemaAndResolvers
+];
+    const addGraphQL = s => schemasAndResolvers.push(s);
+
     // may pass info to frontend, so do that here
-    await setupSync(app, r);
+    await setupSync(app, r, addGraphQL);
 
     // get body
     r.use(
@@ -39,9 +63,19 @@ module.exports = async function(app, r)
     );
 
     // make sure admin is first, so we always verify the admin user
-    setupAdminRoutes(app, r);
-    setupLoginRoutes(app, r);
-    setupAccountRoutes(app, r);
+    setupAdminRoutes(app, r, addGraphQL);
+    setupLoginRoutes(app, r, addGraphQL);
+    setupAccountRoutes(app, r, addGraphQL);
+
+    const resolvers = { JSON:GraphQLJSON, JSONObject:GraphQLJSONObject };
+    Object.assign(resolvers, ...schemasAndResolvers.map(sr => sr.resolvers || {}));
+
+    const schema = makeExecutableSchema({ typeDefs:schemasAndResolvers.map(s => s.schema), resolvers });
+
+    r.use('/graphql',
+        userauth.express.mustBeLoggedIn(true, apiLoginFailure),
+        createHandler({ schema, context: (req, params) => ({ ...app.ctx, session:req.raw.session }) })
+    );
 
     // page rendering
     r.get(/^\/([^/]+).html$/,
