@@ -1,9 +1,29 @@
 const { spawn } = require('node:child_process');
 const fs = require('node:fs');
 const { sleepAsync } = require('utils/utils.js');
+const { getResolvers, getResolversMap } = require('utils/utils-graphql');
 
 module.exports = class HostHandler
 {
+    static graphql_schema = /* graphql */ `
+        type Host
+        {
+            id: Int!
+            user: String!
+            host: String!
+            identity_file: String!
+            paused: Boolean
+            state: String!
+            error: String
+        }
+    `;
+    static graphql_resolvers = {
+        Host: {
+            ...getResolversMap(h => h.host, "id", "user", "host", "identity_file", "paused"),
+            ...getResolvers("state", "error")
+        },
+    };
+    
     constructor(host)
     {
         this.host = host;
@@ -20,11 +40,6 @@ module.exports = class HostHandler
     get userAtHost()
     {
         return this.host.user + '@' + this.host.host;
-    }
-
-    toJSON()
-    {
-        return { ...this.host.toJSON(), state:this.state, error:this.error };
     }
 
     resetTimeout()

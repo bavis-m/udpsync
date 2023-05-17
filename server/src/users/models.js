@@ -1,3 +1,5 @@
+const { getResolvers } = require("utils/utils-graphql");
+
 function getUserModel(sequelize, DataTypes)
 {
     const User = sequelize.define("User", {
@@ -7,31 +9,26 @@ function getUserModel(sequelize, DataTypes)
         //uriRpc: DataTypes.STRING,
         properties: { type:DataTypes.JSON, get() { return JSON.parse(this.getDataValue("properties")); }, set(v) { this.setDataValue("properties", JSON.stringify(v)); } },
     }, { sequelize });
-    return User;
-}
-
-const schemaAndResolvers = { schema: /* graphql */ `
+    User.graphql_schema = /* graphql */ `
 type Query {
     users: [User!]!
+    user(name: String): User
 }
 
 type User {
     name: String!
     properties: JSONObject
 }
-`,
-    resolvers: {
+    `;
+    User.graphql_resolvers = 
+    {
         Query: {
-            users: () =>
-            {
-                return [{name:"admin", properties:{data:3}}];
-            }
+            users: async (p, args, ctx) => await ctx.sequelize.models.User.findAll(),
+            user: async (p, args, ctx) => await ctx.sequelize.models.User.findOne({where:{name:args.name}})
         },
-        User: {
-            name: u => u.name,
-            properties: u => u.properties,
-        }
-    }
-};
+        User: getResolvers("name", "properties")
+    };
+    return User;
+}
 
-module.exports = { getUserModel, schemaAndResolvers };
+module.exports = getUserModel;

@@ -1,9 +1,29 @@
 const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const { sleepAsync } = require('utils/utils.js');
+const { getResolvers, getResolversMap } = require('utils/utils-graphql');
 
 module.exports = class SyncDirHandler
 {
+    static graphql_schema = `
+        type SyncDir
+        {
+            id: Int!
+            local_path: String!
+            remote_path: String!
+            host: Host!
+            state: String!
+            error: String
+        }
+    `;
+    static graphql_resolvers = {
+        SyncDir: {
+            ...getResolversMap(s => s.syncDir, "id", "local_path", "remote_path"),
+            ...getResolvers("state", "error"),
+            host: v => v.hostHandler
+        }
+    };
+
     constructor(hostHandler, syncDir)
     {
         this.hostHandler = hostHandler;

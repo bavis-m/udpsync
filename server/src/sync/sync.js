@@ -1,28 +1,22 @@
 const express = require('express');
 const { loadModels } = require('db_seq.js');
-const { createAPIRoutes, apiLoginFailure } = require('./api/api.js');
 const userauth = require('users/userauth.js');
 const HostHandler = require('./HostHandler.js');
 const SyncDirHandler = require('./SyncDirHandler.js');
+
+const { getResolvers, getResolversMap } = require('utils/utils-graphql');
 
 const handlerByHostId = new Map();
 const handlerBySyncDirId = new Map();
 
 const getModels = require('./models.js');
 
-module.exports = async (app, r) =>
+module.exports = async (app, r, addGraphqlObjects) =>
 {
     if (r === undefined) r = app;
 
     const seq = app.ctx.sequelize;
     const settings = app.ctx.settings;
-
-    const api = express.Router();
-
-    // get body
-    api.use(
-        express.urlencoded({extended:true}),
-    );
 
     await loadModels(seq, getModels);
 
@@ -40,8 +34,38 @@ module.exports = async (app, r) =>
         handlerBySyncDirId.set(syncDir.id, handler);
     }
 
-    createAPIRoutes(api, {name:"host", plural:"hosts"}, id => handlerByHostId.get(parseInt(id)), () => handlerByHostId.values());
-    createAPIRoutes(api, {name:"sync_dir", plural:"sync_dirs"}, id => handlerBySyncDirId.get(parseInt(id)), () => handlerBySyncDirId.values());
+    addGraphqlObjects(
+        HostHandler,
+        SyncDirHandler,
+        {
+            graphql_schema: `
+                type Query
+                {
+                    sync_dirs: [SyncDir!]!
+                    sync_dir(id: Int!): SyncDir
+
+                    hosts: [Host!]!
+                    host(id: Int!): Host
+                }
+                type Host
+                {
+                    sync_dirs: [SyncDir!]!
+                }
+            `,
+            graphql_resolvers: {
+                Query: {
+                    hosts: () => Array.from(handlerByHostId.values()),
+                    host: (p, args, ctx) => handlerByHostId.get(args.id),
+
+                    sync_dirs: () => Array.from(handlerBySyncDirId.values()),
+                    sync_dir: (p, args, ctx) => handlerBySyncDirId.get(args.id),
+                },
+                Host: {
+                    sync_dirs: v => Array.from(handlerBySyncDirId.values()).filter(s => s.syncDir.HostId == v.host.id)
+                }
+            }
+        }
+    );
 
     r.get('/',
         userauth.express.mustBeLoggedIn(false),
@@ -49,14 +73,9 @@ module.exports = async (app, r) =>
         {
             res.initial_data.hosts = (await seq.models.Host.findAll()).map(h => h.toJSON());
             res.initial_data.sync_dirs = (await seq.models.SyncDir.findAll()).map(s => s.toJSON());
-            
+
             req.url = "/home.html";
             next();
         }
-    );
-
-    r.use("/api/",
-        userauth.express.mustBeLoggedIn(false, apiLoginFailure),
-        api
     );
 };

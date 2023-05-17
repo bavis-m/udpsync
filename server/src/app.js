@@ -5,19 +5,22 @@ const nocache = require('nocache');
 const sessionMiddleware = require('session.js');
 const setupSync = require('sync/sync.js');
 
+const { loadModels } = require('db_seq.js');
+const getUserModel = require('users/models.js');
+
 const setupAdminRoutes = require('users/admin.js');
 const setupLoginRoutes = require('users/login.js');
 const setupAccountRoutes = require('users/account.js');
 
 const userauth = require('users/userauth.js');
-const { apiLoginFailure } = require('sync/api/api.js');
+const { graphqlLoginFailure } = require('utils/utils-graphql');
 
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { default: GraphQLJSON, GraphQLJSONObject } = require('graphql-type-json');
 
 const { createHandler } = require('graphql-http/lib/use/express');
 
-const { schemaAndResolvers: userSchemaAndResolvers } = require('users/models.js');
+const _ = require('lodash');
 
 
 module.exports = async function(app, r)
@@ -40,22 +43,30 @@ module.exports = async function(app, r)
         utils.getHelpersMiddleware(),
     );
 
-    const schemasAndResolvers = [{schema:`
-scalar JSON
-scalar JSONObject
+    const graphqlObjects = [{
+        graphql_schema: `
+            scalar JSON
+            scalar JSONObject
+        `,
+        graphql_resolvers: { JSON:GraphQLJSON, JSONObject:GraphQLJSONObject }
+    }];
+    
+    const addGraphqlObjects = (...all) =>
+    {
+        for (var objects of all)
+        {
+            if (!Array.isArray(objects)) objects = [objects];
+            for (var gql of objects)
+            {
+                if (gql.graphql_schema && gql.graphql_resolvers) graphqlObjects.push(gql);
+            }
+        }
+    };
 
-type Query {
-    test: String!
-}
-    `,
-        resolvers: {Query:{test:() => "blah"}}
-    },
-    userSchemaAndResolvers
-];
-    const addGraphQL = s => schemasAndResolvers.push(s);
+    addGraphqlObjects(await loadModels(app.ctx.sequelize, getUserModel));
 
     // may pass info to frontend, so do that here
-    await setupSync(app, r, addGraphQL);
+    await setupSync(app, r, addGraphqlObjects);
 
     // get body
     r.use(
@@ -63,17 +74,16 @@ type Query {
     );
 
     // make sure admin is first, so we always verify the admin user
-    setupAdminRoutes(app, r, addGraphQL);
-    setupLoginRoutes(app, r, addGraphQL);
-    setupAccountRoutes(app, r, addGraphQL);
+    setupAdminRoutes(app, r, addGraphqlObjects);
+    setupLoginRoutes(app, r, addGraphqlObjects);
+    setupAccountRoutes(app, r, addGraphqlObjects);
 
-    const resolvers = { JSON:GraphQLJSON, JSONObject:GraphQLJSONObject };
-    Object.assign(resolvers, ...schemasAndResolvers.map(sr => sr.resolvers || {}));
+    const resolvers = graphqlObjects.reduce((r, n) => n.graphql_resolvers ? _.merge(r, n.graphql_resolvers) : r, {});
 
-    const schema = makeExecutableSchema({ typeDefs:schemasAndResolvers.map(s => s.schema), resolvers });
+    const schema = makeExecutableSchema({ typeDefs:graphqlObjects.map(s => s.graphql_schema), resolvers });
 
     r.use('/graphql',
-        userauth.express.mustBeLoggedIn(true, apiLoginFailure),
+        userauth.express.mustBeLoggedIn(true, graphqlLoginFailure),
         createHandler({ schema, context: (req, params) => ({ ...app.ctx, session:req.raw.session }) })
     );
 

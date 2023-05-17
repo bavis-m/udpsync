@@ -1,7 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const { getUserModel } = require('users/models.js');
-
 async function init(settings)
 {
     const sequelize = new Sequelize(
@@ -12,8 +10,6 @@ async function init(settings)
     );
 
     sequelize.authenticate();
-
-    await loadModels(sequelize, getUserModel);
 
     return sequelize;
 }
