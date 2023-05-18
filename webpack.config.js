@@ -3,7 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const pages = [
-  'login', 'account', 'set_admin', 'home'
+  'login', 'account', 'set_admin', 'home', 'graphiql'
 ];
 
 const plugins = [];
@@ -67,5 +67,13 @@ module.exports = {
   },
   resolve: {
     extensions: ["*", ".js", ".jsx"]
-  }
+  },
+  ignoreWarnings: [
+    {
+      message: /useId/
+    },
+    {
+      message: /graphql-ws/
+    }
+  ]
 };

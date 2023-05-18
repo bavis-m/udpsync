@@ -36,6 +36,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "express-session-sequelize": "^2.3.0",
+    "graphiql": "^2.4.4",
     "graphql-http": "^1.18.0",
     "graphql-type-json": "^0.3.2",
     "lodash": "^4.17.21",

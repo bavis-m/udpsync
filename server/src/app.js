@@ -37,6 +37,7 @@ module.exports = async function(app, r)
 
         // url encoded data ni requests
         express.urlencoded({extended:true}),
+        express.json(),
 
         // load the user's session and the showPage helper()
         sessionMiddleware(app),
@@ -85,6 +86,10 @@ module.exports = async function(app, r)
     r.use('/graphql',
         userauth.express.mustBeLoggedIn(true, graphqlLoginFailure),
         createHandler({ schema, context: (req, params) => ({ ...app.ctx, session:req.raw.session }) })
+    );
+
+    r.use("/graphiql.html",
+        userauth.express.mustBeLoggedIn(true)
     );
 
     // page rendering
