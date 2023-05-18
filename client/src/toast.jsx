@@ -1,4 +1,3 @@
-import { createRoot } from 'react-dom/client';
 import { ToastContainer, toast as reactToast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import convertHtmlToReact from '@hedgedoc/html-to-react';

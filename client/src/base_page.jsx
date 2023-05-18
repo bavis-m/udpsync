@@ -1,4 +1,4 @@
-import { createRoot } from 'react-dom/client';
+//import { createRoot } from 'react-dom/client';
 import { Toast } from "./toast.jsx";
 import {
     CssBaseline,
@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
+import { render } from 'react-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import HomeIcon from '@mui/icons-material/Home';
@@ -90,8 +91,9 @@ export function createBasePage(content)
         }
     });
 
-    const root = createRoot(document.getElementById('root'));
-    root.render(
+    //const root = createRoot(document.getElementById('root'));
+    const root = document.getElementById('root');
+    render(
         <React.Fragment>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
@@ -103,6 +105,7 @@ export function createBasePage(content)
                     {content}
                 </Container>
             </ThemeProvider>
-        </React.Fragment>
+        </React.Fragment>,
+            root
     );
 };
