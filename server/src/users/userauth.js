@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const { URL } = require('node:url');
 const { showPage } = require('utils/utils-express.js');
 
 async function hash(password)
@@ -15,11 +16,6 @@ const express =
 {
     mustBeLoggedIn: function(rehydrateUser, loginMiddleware)
     {
-        if (loginMiddleware === undefined)
-        {
-            loginMiddleware = showPage("login.html");
-        }
-
         return async (req, res, next) =>
         {
             // always rehydrate the user
@@ -41,7 +37,16 @@ const express =
                 next();
             }
             else
-            {
+            {                
+                if (loginMiddleware === undefined)
+                {
+                    let page = "login.html";
+                    const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+                    if (url.pathname.endsWith(".html")) page += "?redirect=" + encodeURIComponent(url.pathname);
+
+                    loginMiddleware = showPage(page);
+                }
+                
                 await loginMiddleware(req, res, next);
             }
         }
@@ -53,7 +58,7 @@ const express =
         {
             if (req.session.authed_user)
             {
-                await res.redirectWithSession(303, '/account.html');
+                await res.redirectWithSession(302, '/account.html');
                 return;
             }
             next();

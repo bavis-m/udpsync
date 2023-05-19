@@ -29,8 +29,9 @@ function getHelpersMiddleware()
 
         res.showPage = async (url, toast = null) =>
         {
+            if (url.startsWith("/")) url = url.substring(1);
             if (toast) res.addMsg(toast);
-            await res.redirectWithSession(303, '/' + url);
+            await res.redirectWithSession(302, '/' + url);
             res.end();
         };
 
