@@ -66,8 +66,9 @@ function LogoutBox(props)
     );
 }
 
-export function createBasePage(content)
+export function createBasePage(content, baseProps)
 {
+    if (!baseProps) baseProps = {};
     const theme = createTheme({
         palette:
         {
@@ -101,7 +102,7 @@ export function createBasePage(content)
     
                 { window.initial_data.authed_user && <LogoutBox authedUser={window.initial_data.authed_user}/> }
                 
-                <Container maxWidth="md" sx={{mt:3}}>
+                <Container maxWidth="md" sx={{mt:3}} {...baseProps}>
                     {content}
                 </Container>
             </ThemeProvider>
