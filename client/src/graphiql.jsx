@@ -9,5 +9,5 @@ const fetcher = createGraphiQLFetcher({ url: 'https://sync.mhack.io/graphql' });
 
 createBasePage(
   <GraphiQL fetcher={fetcher} />,
-  {maxWidth: false, style:{maxWidth:"80%"}}
+  {maxWidth: false, sx:{}, style:{maxWidth:"80%"}}
 );
