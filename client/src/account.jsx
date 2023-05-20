@@ -5,7 +5,7 @@ import React from 'react';
 
 createBasePage(
     <Card sx={{p:3}}>
-        <CardHeader title={window.initial_data.authed_user.name} />
+        <CardHeader title={window.initial_data.authed_user} />
         <CardContent>
             <FormControl component="form" fullWidth action="do_set_password" method="post">
                 <Grid container direction="column" spacing={1}>

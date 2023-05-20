@@ -1,6 +1,7 @@
 const express = require('express');
 const { loadModels } = require('db_seq.js');
 const userauth = require('users/userauth.js');
+
 const HostHandler = require('./HostHandler.js');
 const SyncDirHandler = require('./SyncDirHandler.js');
 
@@ -71,8 +72,7 @@ module.exports = async (app, r, addGraphqlObjects) =>
         userauth.express.mustBeLoggedIn(false),
         async (req, res, next) =>
         {
-            res.initial_data.hosts = (await seq.models.Host.findAll()).map(h => h.toJSON());
-            res.initial_data.sync_dirs = (await seq.models.SyncDir.findAll()).map(s => s.toJSON());
+            await res.addGraphQL("{hosts{id,user,host,identity_file,paused,state,error},sync_dirs{id,local_path,remote_path,host{id},state,error}}");
 
             req.url = "/home.html";
             next();

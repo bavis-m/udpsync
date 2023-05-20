@@ -13,12 +13,14 @@ const setupLoginRoutes = require('users/login.js');
 const setupAccountRoutes = require('users/account.js');
 
 const userauth = require('users/userauth.js');
-const { graphqlLoginFailure } = require('utils/utils-graphql');
+const { graphqlLoginFailure, getGraphQLHelperMiddleware } = require('utils/utils-graphql');
 
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { default: GraphQLJSON, GraphQLJSONObject } = require('graphql-type-json');
 
 const { createHandler } = require('graphql-http/lib/use/express');
+
+const { graphql } = require('graphql');
 
 const _ = require('lodash');
 
@@ -44,12 +46,18 @@ module.exports = async function(app, r)
         utils.getHelpersMiddleware(),
     );
 
+    r.use(getGraphQLHelperMiddleware());
+
     const graphqlObjects = [{
         graphql_schema: `
             scalar JSON
             scalar JSONObject
+
+            type Query {
+                authed_user: String
+            }
         `,
-        graphql_resolvers: { JSON:GraphQLJSON, JSONObject:GraphQLJSONObject }
+        graphql_resolvers: { JSON:GraphQLJSON, JSONObject:GraphQLJSONObject, Query:{ authed_user: (p, args, ctx) => ctx.session.authed_user ? ctx.session.authed_user.name : null } }
     }];
     
     const addGraphqlObjects = (...all) =>
@@ -81,11 +89,12 @@ module.exports = async function(app, r)
 
     const resolvers = graphqlObjects.reduce((r, n) => n.graphql_resolvers ? _.merge(r, n.graphql_resolvers) : r, {});
 
-    const schema = makeExecutableSchema({ typeDefs:graphqlObjects.map(s => s.graphql_schema), resolvers });
+    app.ctx.schema = makeExecutableSchema({ typeDefs:graphqlObjects.map(s => s.graphql_schema), resolvers });
+    
 
     r.use('/graphql',
         userauth.express.mustBeLoggedIn(true, graphqlLoginFailure),
-        createHandler({ schema, context: (req, params) => ({ ...app.ctx, session:req.raw.session }) })
+        createHandler({ schema:app.ctx.schema, context: (req, params) => ({ ...app.ctx, session:req.raw.session }) })
     );
 
     r.use("/graphiql.html",
@@ -94,7 +103,7 @@ module.exports = async function(app, r)
 
     // page rendering
     r.get(/^\/([^/]+).html$/,
-        (req, res) =>
+        async (req, res) =>
         {
             const view = req.params[0];
 
@@ -102,10 +111,7 @@ module.exports = async function(app, r)
 
             res.initial_data.toasts = req.last_state && Array.isArray(req.last_state.toasts) ? req.last_state.toasts : [];
 
-            if (req.session.authed_user)
-            {
-                res.initial_data.authed_user = req.session.authed_user;
-            }
+            await res.addGraphQL("{authed_user}");
 
             let params = { title:settings.title, ...res.template_params, initial_data: `<script>window.initial_data = ${JSON.stringify(res.initial_data)};</script>` };
 

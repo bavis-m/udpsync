@@ -55,7 +55,7 @@ function LogoutBox(props)
                     style={{zIndex: 2001}}
             >
                 <Box m={2}>
-                    <Typography><IconButton component="span" onClick={goTo("/account.html")}><ManageAccountsIcon style={{ fontSize:30 }}/></IconButton> {props.authedUser.name}</Typography>
+                    <Typography><IconButton component="span" onClick={goTo("/account.html")}><ManageAccountsIcon style={{ fontSize:30 }}/></IconButton> {props.authedUser}</Typography>
                     <form action="/do_logout" method="post">
                         <Button sx={{mt:2}} fullWidth variant="contained" type="submit">Log Out</Button>
                     </form>
