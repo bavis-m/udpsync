@@ -19,14 +19,6 @@ for (let page of pages)
     })
   );
 }
-if (process.env.NO_MUSTACHE)
-{
-  plugins.push(new CopyPlugin({
-    patterns: [
-        { from: "./**/*.html", to: "./" }
-    ]
-  }));
-}
 
 module.exports = {
   context: path.resolve(__dirname, 'client/src'),

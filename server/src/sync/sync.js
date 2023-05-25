@@ -1,75 +1,65 @@
-const express = require('express');
-const { loadModels } = require('db_seq.js');
-const userauth = require('users/userauth.js');
+const { mustBeLoggedIn } = require('userauth.js');
 
 const HostHandler = require('./HostHandler.js');
 const SyncDirHandler = require('./SyncDirHandler.js');
 
-const { getResolvers, getResolversMap } = require('utils/utils-graphql');
-
 const handlerByHostId = new Map();
 const handlerBySyncDirId = new Map();
 
-const getModels = require('./models.js');
-
-module.exports = async (app, r, addGraphqlObjects) =>
+function setupData(seq, graphql)
 {
-    if (r === undefined) r = app;
+    HostHandler.setupData(seq, graphql);
+    SyncDirHandler.setupData(seq, graphql);
 
-    const seq = app.ctx.sequelize;
-    const settings = app.ctx.settings;
+    graphql.addSchemas(`
+        type Query
+        {
+            sync_dirs: [SyncDir!]!
+            sync_dir(id: Int!): SyncDir
 
-    await loadModels(seq, getModels);
+            hosts: [Host!]!
+            host(id: Int!): Host
+        }
+        type Host
+        {
+            sync_dirs: [SyncDir!]!
+        }
+    `);
 
-    for (const host of await seq.models.Host.findAll())
+    graphql.addResolvers({
+        Query: {
+            hosts: () => Array.from(handlerByHostId.values()),
+            host: (p, args, ctx) => handlerByHostId.get(args.id),
+
+            sync_dirs: () => Array.from(handlerBySyncDirId.values()),
+            sync_dir: (p, args, ctx) => handlerBySyncDirId.get(args.id),
+        },
+        Host: {
+            sync_dirs: v => Array.from(handlerBySyncDirId.values()).filter(s => s.syncDir.HostId == v.host.id)
+        }
+    });
+}
+
+async function setup(app, r)
+{
+    for (const host of await HostHandler.Host.findAll())
     {
         const handler = new HostHandler(host);
         handler.run();
         handlerByHostId.set(host.id, handler);
     }
 
-    for (const syncDir of await seq.models.SyncDir.findAll())
+    for (const syncDir of await SyncDirHandler.SyncDir.findAll())
     {
         const handler = new SyncDirHandler(handlerByHostId.get(syncDir.HostId), syncDir);
         handler.run();
         handlerBySyncDirId.set(syncDir.id, handler);
     }
 
-    addGraphqlObjects(
-        HostHandler,
-        SyncDirHandler,
-        {
-            graphql_schema: `
-                type Query
-                {
-                    sync_dirs: [SyncDir!]!
-                    sync_dir(id: Int!): SyncDir
-
-                    hosts: [Host!]!
-                    host(id: Int!): Host
-                }
-                type Host
-                {
-                    sync_dirs: [SyncDir!]!
-                }
-            `,
-            graphql_resolvers: {
-                Query: {
-                    hosts: () => Array.from(handlerByHostId.values()),
-                    host: (p, args, ctx) => handlerByHostId.get(args.id),
-
-                    sync_dirs: () => Array.from(handlerBySyncDirId.values()),
-                    sync_dir: (p, args, ctx) => handlerBySyncDirId.get(args.id),
-                },
-                Host: {
-                    sync_dirs: v => Array.from(handlerBySyncDirId.values()).filter(s => s.syncDir.HostId == v.host.id)
-                }
-            }
-        }
-    );
+    if (r === undefined) r = app;
 
     r.get('/',
-        userauth.express.mustBeLoggedIn(false),
+        mustBeLoggedIn(false),
         async (req, res, next) =>
         {
             await res.addGraphQL("{hosts{id,user,host,identity_file,paused,state,error},sync_dirs{id,local_path,remote_path,host{id},state,error}}");
@@ -78,4 +68,6 @@ module.exports = async (app, r, addGraphqlObjects) =>
             next();
         }
     );
-};
+}
+
+module.exports = { setupData, setup };

@@ -4,11 +4,13 @@ require('app-module-path').addPath(__dirname);
 const express = require('express');
 const mustache = require('mustache-express');
 
-const { init: sequelize } = require('./db_seq.js');
+const sequelize = require('db.js');
 
-const setMainAppRoutes = require('./app.js');
+const GraphQLBuilder = require('graphql-builder.js');
 
-let utils = require('./utils/utils.js');
+const { setupData:setupAppData, setup:setupApp } = require('app.js');
+
+let utils = require('utils/utils.js');
 
 
 let settings = {
@@ -40,6 +42,7 @@ let settings = {
 
     app.ctx = {
         sequelize: await sequelize(settings),
+        graphql: new GraphQLBuilder(),
         settings
     };
 
@@ -49,7 +52,28 @@ let settings = {
     app.set('views', '/app/client/dist/views');
     app.set('etag', false);
 
-    await setMainAppRoutes(app);
+    app.use(
+        // public static files/bundled files served straight away
+        express.static('/app/client/public'),
+        express.static('/app/client/dist/public'),
+
+        express.urlencoded({extended:true}),
+        express.json()
+    );
+
+    // app specific setup
+    setupAppData(app.ctx.sequelize, app.ctx.graphql);
+
+    await app.ctx.sequelize.sync({ alter:true });
+    app.ctx.graphql.build();
+
+    setupApp(app);
+    // end app specific setup
+
+    app.use(
+        // just in case
+        (_, res) => res.status(404).end() 
+    );
     
 
     app.listen(settings.port, () => {
